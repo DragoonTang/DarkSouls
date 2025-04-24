@@ -8,9 +8,11 @@ public class PlayerLocomotionManager : CharacterLocomotionManager
     public float verticalMovement;
     public float horizontalMovement;
     Vector3 moveDirection;
+    Vector3 targetRotationDirection;
 
     [SerializeField] float walkingSpeed = 2f;
     [SerializeField] float runningSpeed = 5f;
+    [SerializeField] float rotationSpeed = 15;
 
     protected override void Awake()
     {
@@ -26,6 +28,8 @@ public class PlayerLocomotionManager : CharacterLocomotionManager
     {
         // 地面上移动
         HandleGroundedMovement();
+        // 旋转
+        HandleRotation();
     }
 
     void GetVerticalInputAndHorizontalInput()
@@ -49,5 +53,17 @@ public class PlayerLocomotionManager : CharacterLocomotionManager
         // 如果当前正在地面移动，则输入值大于0.5为奔跑，否则为行走
         if (PlayerInputManager.instance.moveAmount > 0)
             player.characterController.Move((PlayerInputManager.instance.moveAmount > .5f ? runningSpeed : walkingSpeed) * Time.deltaTime * moveDirection);
+    }
+
+    void HandleRotation()
+    {
+        targetRotationDirection = PlayerCamera.instance.cameraObject.transform.forward * verticalMovement + PlayerCamera.instance.cameraObject.transform.right * horizontalMovement;
+        targetRotationDirection.Normalize();
+        targetRotationDirection.y = 0;
+
+        if (targetRotationDirection == Vector3.zero)
+            targetRotationDirection = transform.forward;
+
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetRotationDirection), rotationSpeed * Time.deltaTime);
     }
 }

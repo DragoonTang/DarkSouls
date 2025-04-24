@@ -3,6 +3,7 @@ using UnityEngine;
 public class PlayerCamera : MonoBehaviour
 {
     public static PlayerCamera instance;
+    public Camera cameraObject;
 
     private void Awake()
     {

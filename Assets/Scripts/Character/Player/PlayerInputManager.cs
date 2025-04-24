@@ -63,6 +63,21 @@ public class PlayerInputManager : MonoBehaviour
         playerContorls.Enable();
     }
 
+    /// <summary>
+    /// 如果游戏程序窗口失去焦点，则暂停监听
+    /// </summary>
+    /// <param name="focus"></param>
+    private void OnApplicationFocus(bool focus)
+    {
+        if (enabled)
+        {
+            if (focus)
+                playerContorls.Enable();
+            else
+                playerContorls.Disable();
+        }
+    }
+
     private void OnDestroy()
     {
         // 销毁时记住注销

@@ -13,6 +13,11 @@ public class PlayerManager : CharacterManager
     override protected void Update()
     {
         base.Update();
+
+        // 不允许控制非拥有者的对象
+        if (!IsOwner)
+            return;
+
         playerLocomotionManager.HandleAllMovement();
     }
 }
