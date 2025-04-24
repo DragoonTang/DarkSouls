@@ -12,6 +12,9 @@ public class PlayerInputManager : MonoBehaviour
     PlayerControls playerContorls;
 
     [SerializeField] Vector2 movemomt;
+    public float verticalInput;
+    public float horizontalInput;
+    public float moveAmount;
 
     private void Awake()
     {
@@ -23,14 +26,19 @@ public class PlayerInputManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        // 每次换场景时需要执行一次
-        SceneManager.activeSceneChanged += OnSceneChange;
     }
 
     private void Start()
     {
-        instance.enabled = false;
         DontDestroyOnLoad(gameObject);
+        // 每次换场景时需要执行一次
+        SceneManager.activeSceneChanged += OnSceneChange;
+        instance.enabled = false;
+    }
+
+    private void Update()
+    {
+        HandleMovemontInput();
     }
 
     /// <summary>
@@ -59,5 +67,18 @@ public class PlayerInputManager : MonoBehaviour
     {
         // 销毁时记住注销
         SceneManager.activeSceneChanged -= OnSceneChange;
+    }
+
+    private void HandleMovemontInput()
+    {
+        verticalInput = movemomt.y;
+        horizontalInput = movemomt.x;
+
+        // 返回绝对值
+        moveAmount = Mathf.Clamp01(Mathf.Abs(verticalInput) + Mathf.Abs(horizontalInput));
+
+        // 限制moveAmount为0或0.5或1
+        if (moveAmount > 0)
+            moveAmount = moveAmount > 0.5f ? 1 : 0.5f;
     }
 }
