@@ -11,10 +11,16 @@ public class PlayerInputManager : MonoBehaviour
     /// </summary>
     PlayerControls playerContorls;
 
-    [SerializeField] Vector2 movemomt;
+    [Header("移动输入")]
+    [SerializeField] Vector2 movemomtInput;
     public float verticalInput;
     public float horizontalInput;
     public float moveAmount;
+
+    [Header("相机输入")]
+    [SerializeField] Vector2 cameraInput;
+    public float cameraVerticalInput;
+    public float cameraHorizontalInput;
 
     private void Awake()
     {
@@ -39,6 +45,7 @@ public class PlayerInputManager : MonoBehaviour
     private void Update()
     {
         HandleMovemontInput();
+        HandleCameraInput();
     }
 
     /// <summary>
@@ -57,7 +64,8 @@ public class PlayerInputManager : MonoBehaviour
         {
             playerContorls = new PlayerControls();
 
-            playerContorls.PlayerMovement.Movement.performed += i => movemomt = i.ReadValue<Vector2>();
+            playerContorls.PlayerMovement.Movement.performed += i => movemomtInput = i.ReadValue<Vector2>();
+            playerContorls.PlayerCamera.CamerasControls.performed += i => cameraInput = i.ReadValue<Vector2>();
         }
 
         playerContorls.Enable();
@@ -86,8 +94,8 @@ public class PlayerInputManager : MonoBehaviour
 
     private void HandleMovemontInput()
     {
-        verticalInput = movemomt.y;
-        horizontalInput = movemomt.x;
+        verticalInput = movemomtInput.y;
+        horizontalInput = movemomtInput.x;
 
         // 返回绝对值
         moveAmount = Mathf.Clamp01(Mathf.Abs(verticalInput) + Mathf.Abs(horizontalInput));
@@ -95,5 +103,10 @@ public class PlayerInputManager : MonoBehaviour
         // 限制moveAmount为0或0.5或1
         if (moveAmount > 0)
             moveAmount = moveAmount > 0.5f ? 1 : 0.5f;
+    }
+
+    private void HandleCameraInput() {
+        cameraVerticalInput = cameraInput.y;
+        cameraHorizontalInput = cameraInput.x;
     }
 }
