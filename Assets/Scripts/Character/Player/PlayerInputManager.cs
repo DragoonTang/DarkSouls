@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 public class PlayerInputManager : MonoBehaviour
 {
     public static PlayerInputManager instance;
+    public PlayerManager player;
 
     /// <summary>
     /// 需要把Input Action转换为C#类
@@ -103,9 +104,15 @@ public class PlayerInputManager : MonoBehaviour
         // 限制moveAmount为0或0.5或1
         if (moveAmount > 0)
             moveAmount = moveAmount > 0.5f ? 1 : 0.5f;
+
+        if (!player) return;
+
+        // 平时没有横轴移动，只在锁定状态下才有横轴移动
+        player.playerAnimatorManager.UpdateAnimatorMovement(0, moveAmount);
     }
 
-    private void HandleCameraInput() {
+    private void HandleCameraInput()
+    {
         cameraVerticalInput = cameraInput.y;
         cameraHorizontalInput = cameraInput.x;
     }

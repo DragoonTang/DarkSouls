@@ -1,12 +1,20 @@
 using System;
 using UnityEngine;
 
+/// <summary>
+/// 每个客户端上，可能出现多个该脚本的实例
+/// 其中，只有一个是自己的，其他的是别的玩家生成在本机上的克隆
+/// 所以，需要把自己的输入值传给网络对象，由别人的客户端上的克隆来获取
+/// 反之，本机上的克隆也要把网络对象上的输入值传给自己，以此来实现网络同步（复现别人玩家的操作）
+/// </summary>
 public class PlayerLocomotionManager : CharacterLocomotionManager
 {
     PlayerManager player;
 
     public float verticalMovement;
     public float horizontalMovement;
+    public float moveAmount;
+
     Vector3 moveDirection;
     Vector3 targetRotationDirection;
 
@@ -21,6 +29,31 @@ public class PlayerLocomotionManager : CharacterLocomotionManager
         player = GetComponent<PlayerManager>();
     }
 
+    protected override void Update()
+    {
+        base.Update();
+
+        // 把自己这边的输入值传给网络对象
+        if (player.IsOwner)
+        {
+            player.characterNetworkManager.verticalMovement.Value = verticalMovement;
+            player.characterNetworkManager.horizontalMovement.Value = horizontalMovement;
+            player.characterNetworkManager.moveAmount.Value = moveAmount;
+        }
+        // 当这个脚本是别人的时候，则要从网络对象上获取输入值
+        else
+        {
+            verticalMovement = player.characterNetworkManager.verticalMovement.Value;
+            horizontalMovement = player.characterNetworkManager.horizontalMovement.Value;
+            moveAmount = player.characterNetworkManager.moveAmount.Value;
+
+            // 然后通过获取的值，在本机上传给动画，以实现动画的同步
+            player.playerAnimatorManager.UpdateAnimatorMovement(0,moveAmount);
+
+            // 如果是锁敌状态，需要横轴移动时
+        }
+    }
+
     /// <summary>
     /// 由PlayerManager每帧调用
     /// </summary>
@@ -32,16 +65,17 @@ public class PlayerLocomotionManager : CharacterLocomotionManager
         HandleRotation();
     }
 
-    void GetVerticalInputAndHorizontalInput()
+    void GetMovementValue()
     {
         // 获取垂直和水平输入值
         verticalMovement = PlayerInputManager.instance.verticalInput;
         horizontalMovement = PlayerInputManager.instance.horizontalInput;
+        moveAmount = PlayerInputManager.instance.moveAmount;
     }
 
     void HandleGroundedMovement()
     {
-        GetVerticalInputAndHorizontalInput();
+        GetMovementValue();
 
         // 当前移动方向等于X轴和Z轴的输入值与相机的前向和右向的乘积
         moveDirection = PlayerCamera.instance.transform.forward * verticalMovement + PlayerCamera.instance.transform.right * horizontalMovement;

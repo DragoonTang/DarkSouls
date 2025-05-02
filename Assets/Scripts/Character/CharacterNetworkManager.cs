@@ -1,6 +1,9 @@
 using Unity.Netcode;
 using UnityEngine;
 
+/// <summary>
+/// 用来作为中间件在网络上同步角色的状态
+/// </summary>
 public class CharacterNetworkManager : NetworkBehaviour
 {
     [Header("位置")]
@@ -14,4 +17,9 @@ public class CharacterNetworkManager : NetworkBehaviour
     /// </summary>
     public float networkPositionSmoothTime = 0.1f;
     public float networkRotationSmoothTIme = 0.1f;
+
+    [Header("动画")]
+    public NetworkVariable<float> horizontalMovement = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public NetworkVariable<float> verticalMovement = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public NetworkVariable<float> moveAmount = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 }

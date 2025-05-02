@@ -2,12 +2,14 @@ using UnityEngine;
 
 public class PlayerManager : CharacterManager
 {
-    PlayerLocomotionManager playerLocomotionManager;
+    [HideInInspector] PlayerLocomotionManager playerLocomotionManager;
+    [HideInInspector] public PlayerAnimatorManager playerAnimatorManager;
 
     override protected void Awake()
     {
         base.Awake();
         playerLocomotionManager = GetComponent<PlayerLocomotionManager>();
+        playerAnimatorManager = GetComponent<PlayerAnimatorManager>();
     }
 
     override protected void Update()
@@ -32,6 +34,9 @@ public class PlayerManager : CharacterManager
         PlayerCamera.instance.HandleAllCameraAction();
     }
 
+    /// <summary>
+    /// 这个生命期函数在网络对象被创建时调用
+    /// </summary>
     public override void OnNetworkSpawn()
     {
         base.OnNetworkDespawn();
@@ -39,6 +44,7 @@ public class PlayerManager : CharacterManager
         if (IsOwner)
         {
             PlayerCamera.instance.player = this;
+            PlayerInputManager.instance.player = this;
         }
     }
 }

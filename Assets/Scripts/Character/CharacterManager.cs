@@ -6,8 +6,9 @@ using UnityEngine;
 /// </summary>
 public class CharacterManager : NetworkBehaviour
 {
-    public CharacterController characterController;
-    CharacterNetworkManager characterNetworkManager;
+    [HideInInspector] public CharacterController characterController;
+    [HideInInspector] public Animator animator;
+    [HideInInspector] public CharacterNetworkManager characterNetworkManager;
 
     protected virtual void Awake()
     {
@@ -15,6 +16,7 @@ public class CharacterManager : NetworkBehaviour
 
         characterController = GetComponent<CharacterController>();
         characterNetworkManager = GetComponent<CharacterNetworkManager>();
+        animator = GetComponent<Animator>();
     }
 
     protected virtual void Update()
@@ -45,6 +47,6 @@ public class CharacterManager : NetworkBehaviour
 
     protected virtual void LateUpdate()
     {
-        
+
     }
 }
