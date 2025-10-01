@@ -50,8 +50,8 @@ MonoBehaviour:
   cameraPivotTransform: {fileID: 469813256357943265}
   minimumPivot: -35
   maximumPivot: 35
-  leftAndRightRotationSpeed: 220
-  upAndDownRotationSpeed: 200
+  leftAndRightRotationSpeed: 50
+  upAndDownRotationSpeed: 50
   cameraCollisionOffset: 0.2
   cameraCollisionRadius: 0.2
   collideWithLayers:

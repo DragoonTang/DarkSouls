@@ -15,12 +15,15 @@ public class PlayerLocomotionManager : CharacterLocomotionManager
     public float horizontalMovement;
     public float moveAmount;
 
+    [Header("移动相关")]
     Vector3 moveDirection;
     Vector3 targetRotationDirection;
-
     [SerializeField] float walkingSpeed = 2f;
     [SerializeField] float runningSpeed = 5f;
     [SerializeField] float rotationSpeed = 15;
+
+    [Header("翻滚相关")]
+    Vector3 rollDirection;
 
     protected override void Awake()
     {
@@ -48,7 +51,7 @@ public class PlayerLocomotionManager : CharacterLocomotionManager
             moveAmount = player.characterNetworkManager.moveAmount.Value;
 
             // 然后通过获取的值，在本机上传给动画，以实现动画的同步
-            player.playerAnimatorManager.UpdateAnimatorMovement(0,moveAmount);
+            player.playerAnimatorManager.UpdateAnimatorMovement(0, moveAmount);
 
             // 如果是锁敌状态，需要横轴移动时
         }
@@ -75,6 +78,9 @@ public class PlayerLocomotionManager : CharacterLocomotionManager
 
     void HandleGroundedMovement()
     {
+        if (!player.canMove)
+            return;
+
         GetMovementValue();
 
         // 当前移动方向等于X轴和Z轴的输入值与相机的前向和右向的乘积
@@ -91,6 +97,10 @@ public class PlayerLocomotionManager : CharacterLocomotionManager
 
     void HandleRotation()
     {
+        // 如果当前不允许旋转，则直接返回
+        if (!player.canRotate)
+            return;
+
         targetRotationDirection = PlayerCamera.instance.cameraObject.transform.forward * verticalMovement + PlayerCamera.instance.cameraObject.transform.right * horizontalMovement;
         targetRotationDirection.Normalize();
         targetRotationDirection.y = 0;
@@ -99,5 +109,26 @@ public class PlayerLocomotionManager : CharacterLocomotionManager
             targetRotationDirection = transform.forward;
 
         transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetRotationDirection), rotationSpeed * Time.deltaTime);
+    }
+
+    public void AttemptToPerformDodge()
+    {
+        // 如果当前正在做动作，则不允许翻滚
+        if (player.isPerformingAction)
+            return;
+
+        if (PlayerInputManager.instance.moveAmount > 0)
+        {
+            rollDirection =
+                PlayerCamera.instance.cameraObject.transform.forward * PlayerInputManager.instance.verticalInput    // Z轴
+                + PlayerCamera.instance.cameraObject.transform.right * PlayerInputManager.instance.horizontalInput; // X轴
+
+            // 是否需要归一化？
+            rollDirection.y = 0;
+            rollDirection.Normalize();
+            player.transform.rotation = Quaternion.LookRotation(rollDirection);
+
+            player.playerAnimatorManager.PlayTargetAnimation("Roll_Forward_01", true);
+        }
     }
 }

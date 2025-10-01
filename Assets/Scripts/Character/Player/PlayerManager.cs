@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlayerManager : CharacterManager
 {
-    [HideInInspector] PlayerLocomotionManager playerLocomotionManager;
+    [HideInInspector] public PlayerLocomotionManager playerLocomotionManager;
     [HideInInspector] public PlayerAnimatorManager playerAnimatorManager;
 
     override protected void Awake()

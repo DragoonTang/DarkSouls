@@ -12,16 +12,19 @@ public class PlayerInputManager : MonoBehaviour
     /// </summary>
     PlayerControls playerContorls;
 
+    [Header("相机输入")]
+    [SerializeField] Vector2 cameraInput;
+    public float cameraVerticalInput;
+    public float cameraHorizontalInput;
+
     [Header("移动输入")]
     [SerializeField] Vector2 movemomtInput;
     public float verticalInput;
     public float horizontalInput;
     public float moveAmount;
 
-    [Header("相机输入")]
-    [SerializeField] Vector2 cameraInput;
-    public float cameraVerticalInput;
-    public float cameraHorizontalInput;
+    [Header("Player Action Input")]
+    [SerializeField] bool dodgeInput;
 
     private void Awake()
     {
@@ -43,12 +46,6 @@ public class PlayerInputManager : MonoBehaviour
         instance.enabled = false;
     }
 
-    private void Update()
-    {
-        HandleMovemontInput();
-        HandleCameraInput();
-    }
-
     /// <summary>
     /// 当不在游戏场景时，禁用玩家操作
     /// </summary>
@@ -67,6 +64,7 @@ public class PlayerInputManager : MonoBehaviour
 
             playerContorls.PlayerMovement.Movement.performed += i => movemomtInput = i.ReadValue<Vector2>();
             playerContorls.PlayerCamera.CamerasControls.performed += i => cameraInput = i.ReadValue<Vector2>();
+            playerContorls.PlayerActions.Dodge.performed += i => dodgeInput = true;
         }
 
         playerContorls.Enable();
@@ -93,6 +91,18 @@ public class PlayerInputManager : MonoBehaviour
         SceneManager.activeSceneChanged -= OnSceneChange;
     }
 
+    private void Update()
+    {
+        HandleAllInput();
+    }
+
+    private void HandleAllInput()
+    {
+        HandleMovemontInput();
+        HandleCameraInput();
+        HandleDodgeInput();
+    }
+
     private void HandleMovemontInput()
     {
         verticalInput = movemomtInput.y;
@@ -115,5 +125,17 @@ public class PlayerInputManager : MonoBehaviour
     {
         cameraVerticalInput = cameraInput.y;
         cameraHorizontalInput = cameraInput.x;
+    }
+
+    private void HandleDodgeInput()
+    {
+        if (dodgeInput)
+        {
+            dodgeInput = false;
+            if (player)
+            {
+                player.playerLocomotionManager.AttemptToPerformDodge();
+            }
+        }
     }
 }

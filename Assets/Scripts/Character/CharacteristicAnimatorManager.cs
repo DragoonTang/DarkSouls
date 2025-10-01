@@ -17,4 +17,15 @@ public class CharacteristicAnimatorManager : MonoBehaviour
         character.animator.SetFloat("Horizontal", horizontalValue, 0.1f, Time.deltaTime);
         character.animator.SetFloat("Vertical", verticalValue, 0.1f, Time.deltaTime);
     }
+
+    public virtual void PlayTargetAnimation(string targetAnim, bool isPerformingAction, bool applyRootMotion = false, bool canRotate = false, bool canMove = false)
+    {
+        character.animator.applyRootMotion = applyRootMotion;
+        character.animator.CrossFade(targetAnim, 0.2f);
+
+        // 可以用来停止角色产生新的动作
+        character.isPerformingAction = isPerformingAction;
+        character.canRotate = canRotate;
+        character.canMove = canMove;
+    }
 }
